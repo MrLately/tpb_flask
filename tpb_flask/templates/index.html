@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script>
+        async function unrestrictLink(magnetLink) {
+
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+
+            const response = await fetch('/unrestrict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `magnet_link=${encodeURIComponent(magnetLink)}`
+            });
+            const data = await response.json();
+            
+            loader.style.display = 'none';
+
+            document.getElementById('torrentList').style.display = 'none';
+            const magnetContainer = document.getElementById('magnetContainer');
+
+            if (data.error) {
+                magnetContainer.innerHTML = `<p>${data.error}</p>`;
+            } else {
+
+                magnetContainer.innerHTML = `<p>Unrestricted Link: <a href="${data.unrestricted_link}" target="_blank">${data.unrestricted_link}</a></p>`;
+            }
+            magnetContainer.style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <form action="/" method="post">
+            <input type="text" name="imdb_id" placeholder="Enter IMDb ID" required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="magnetContainer" style="display:none;"></div>
+        <div id="loader" class="loader" style="display:none;"></div>
+        {% if search %}
+            <ul id="torrentList" class="torrent-list">
+                {% for torrent in torrents %}
+                    <li onclick="unrestrictLink('{{ torrent.magnet_link }}')">
+                        <p>Title: {{ torrent.name }}</p>
+                        <p>Size: {{ torrent.file_size }}</p>
+                        <p>Seeders: {{ torrent.seeders }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</body>
+</html>

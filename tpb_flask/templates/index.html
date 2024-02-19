@@ -8,7 +8,6 @@
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <script>
         async function unrestrictLink(magnetLink) {
-
             const loader = document.getElementById('loader');
             loader.style.display = 'block';
 
@@ -22,17 +21,31 @@
             const data = await response.json();
             
             loader.style.display = 'none';
-
             document.getElementById('torrentList').style.display = 'none';
             const magnetContainer = document.getElementById('magnetContainer');
 
             if (data.error) {
                 magnetContainer.innerHTML = `<p>${data.error}</p>`;
             } else {
-
-                magnetContainer.innerHTML = `<p>Unrestricted Link: <a href="${data.unrestricted_link}" target="_blank">${data.unrestricted_link}</a></p>`;
+                magnetContainer.innerHTML = `
+                    <p>Unrestricted Link: <a href="${data.unrestricted_link}" target="_blank">${data.unrestricted_link}</a></p>
+                    <button onclick="copyLinkToClipboard('${data.unrestricted_link}')">Copy Link</button>
+                    <button onclick="openInVLCInstructions()">Open in VLC</button>
+                `;
             }
             magnetContainer.style.display = 'block';
+        }
+
+        function copyLinkToClipboard(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(err => {
+                console.error('Error copying link to clipboard', err);
+            });
+        }
+
+        function openInVLCInstructions() {
+            alert("To open the link in VLC: \n1. Copy the link. \n2. Open VLC. \n3. Go to Media > Open Network Stream. \n4. Paste the link and play.");
         }
     </script>
 </head>

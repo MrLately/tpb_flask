@@ -3,7 +3,6 @@ import httpx
 import asyncio
 import config
 
-# Configuration Variables
 app = Flask(__name__)
 real_debrid_api_token = config.REAL_DEBRID_API_TOKEN
 headers = {"Authorization": f"Bearer {real_debrid_api_token}"}
